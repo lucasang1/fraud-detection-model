@@ -46,9 +46,10 @@ if view == "Metrics":
     cm_norm = cm.astype(float) / cm.sum(axis = 1)[:, np.newaxis]
     
     tn, fp, fn, tp = cm.ravel()
-    col4, col5 = st.columns(2)
-    col4.metric("Falsely Flagged as Fraud (FP)", fp)
-    col5.metric("Fraud Not Flagged (FN)", fn)
+    col4, col5, col6 = st.columns(3)
+    col4.metric("Total Inaccurate Predictions", fp + fn, f"{(fp + fn)/len(y_test):.2%}")
+    col5.metric("Falsely Flagged as Fraud (FP)", fp)
+    col6.metric("Fraud Not Flagged (FN)", fn)
 
     fig, ax = plt.subplots()
     sns.heatmap(cm_norm, annot = cm, fmt = "d", cmap = 'PuBu', cbar = False, xticklabels = ["False", "True"], yticklabels = ["False", "True"])
@@ -98,7 +99,7 @@ elif view == "Predict Batch":
         st.download_button('Download Predictions', df_input.to_csv(index = False), "predictions.csv")
 
 elif view == "Feature Importance":
-    st.header("Feature Importances")
+    st.header("Feature Importance")
     importances = pipeline.named_steps['classifier'].feature_importances_
     feat_df = pd.DataFrame({'Feature': X.columns,'Importance': importances}).sort_values(by = 'Importance', ascending = True)
     fig_feat = px.bar(feat_df, x = "Importance", y = 'Feature', orientation = 'h')
