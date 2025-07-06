@@ -16,13 +16,20 @@ st.set_page_config(layout = "centered")
 st.title("Fraud Detection Model Dashboard")
 
 # load data
-df_full = pd.read_csv("cc_statistics.csv")
+@st.cache_data(show_spinner=False)
+def load_data(path: str) -> pd.DataFrame:
+    df = pd.read_csv("cc_statistics.csv")
+    return df
+df_full = load_data("cc_statistics.csv")
 df = df_full.dropna(subset = ['prev_amount', 'secs_since_prev', 'roll_mean_5', 'roll_sd_5', 'hour'])
 df = drop_unused(df)
 X, y = split_X_y(df)
 
 # load model
-pipeline = load("pipeline.pkl")
+@st.cache_resource(show_spinner=False)
+def load_model(path: str):
+    return load(path)
+pipeline = load_model("pipeline.pkl")
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 y_predict = pipeline.predict(X_test)
 y_predict_proba = pipeline.predict_proba(X_test)[:, 1]

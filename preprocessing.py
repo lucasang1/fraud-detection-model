@@ -1,6 +1,3 @@
-import pandas as pd
-from sklearn.preprocessing import StandardScaler
-
 # define cleaning methods
 def drop_unused(df):
     return df.drop(columns = ['row_num']) # not sure if this is needed
